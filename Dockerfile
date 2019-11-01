@@ -1,4 +1,4 @@
-# VERSION 1.10.9
+# VERSION 1.10.10
 # AUTHOR: Matthieu "Puckel_" Roisil
 # DESCRIPTION: Basic Airflow container
 # BUILD: docker build --rm -t puckel/docker-airflow .
@@ -12,11 +12,12 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux
 
 # Airflow
-ARG AIRFLOW_VERSION=1.10.9
+ARG AIRFLOW_VERSION=1.10.10
 ARG AIRFLOW_USER_HOME=/usr/local/airflow
 ARG AIRFLOW_DEPS=""
 ARG PYTHON_DEPS=""
 ENV AIRFLOW_HOME=${AIRFLOW_USER_HOME}
+ENV PYTHONPATH="${PYTHONPATH}:${AIRFLOW_HOME}"
 
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
@@ -38,6 +39,7 @@ RUN set -ex \
         libpq-dev \
         git \
     ' \
+    && seq 1 8 | xargs -I{} mkdir -p /usr/share/man/man{} \
     && apt-get update -yqq \
     && apt-get upgrade -yqq \
     && apt-get install -yqq --no-install-recommends \
@@ -50,6 +52,7 @@ RUN set -ex \
         rsync \
         netcat \
         locales \
+        postgresql-client \
     && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     && locale-gen \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
